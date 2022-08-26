@@ -1479,6 +1479,48 @@ void main() {
       expect(find.byKey(targetKey), findsNothing);
     });
 
+    testWidgets(
+      'SystemNavigator.pop completes flow when last page',
+      (tester) async {
+        const button1Key = Key('__button1__');
+        final controller = FlowController(0);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: FlowBuilder<int>(
+              controller: controller,
+              onGeneratePages: (state, pages) {
+                return <Page<dynamic>>[
+                  MaterialPage<void>(
+                    child: Builder(
+                      builder: (context) => Scaffold(
+                        body: TextButton(
+                          key: button1Key,
+                          onPressed: () {
+                            TestSystemNavigationObserver.handleSystemNavigation(
+                              const MethodCall('popRoute'),
+                            );
+                          },
+                          child: const Text('Button'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ];
+              },
+            ),
+          ),
+        );
+
+        expect(controller.completed, isFalse);
+
+        expect(find.byKey(button1Key), findsOneWidget);
+        await tester.tap(find.byKey(button1Key));
+        await tester.pumpAndSettle();
+
+        expect(controller.completed, isTrue);
+      },
+    );
+
     testWidgets('updates do not trigger rebuilds of existing pages by value',
         (tester) async {
       const buttonKey = Key('__button__');
