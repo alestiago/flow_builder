@@ -142,7 +142,7 @@ class _FlowBuilderState<T> extends State<FlowBuilder<T>> {
       final popHandled = await _navigator?.maybePop() ?? false;
       if (popHandled) return true;
       if (mounted && !_canPop) return Navigator.of(context).maybePop();
-      if (mounted && _pages.length == 1) _controller.complete();
+      if (_pages.length == 1) _controller.complete();
       return false;
     }
     return false;
